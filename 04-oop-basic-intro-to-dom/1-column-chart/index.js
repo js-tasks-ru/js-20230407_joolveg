@@ -10,6 +10,10 @@ export default class ColumnChart {
     this.render();
   }
 
+  calcClass () {
+    return this.data?.length ? 'column-chart' : 'column-chart column-chart_loading';
+  }
+
   getTemplate () {
     const linkTemplate = this.link ? `<a class="column-chart__link" href="${this.link}">View all</a>` : '';
 
@@ -31,15 +35,16 @@ export default class ColumnChart {
 
   render () {
     const wrapper = document.createElement('div');
-    wrapper.className = this.data?.length ? 'column-chart' : 'column-chart column-chart_loading';
-    wrapper.style = '--chart-height: 50';
+    wrapper.className = this.calcClass();
+    wrapper.style = `--chart-height: ${this.chartHeight}`;
     wrapper.innerHTML = this.getTemplate();
     this.element = wrapper;
   }
 
   getColumnChartBody () {
     const maxValue = Math.max(...this.data);
-    const scale = 50 / maxValue;
+
+    const scale = this.chartHeight / maxValue;
 
     return this.data.map((item) => {
       const percent = `${((item / maxValue) * 100).toFixed(0)}%`;
@@ -48,11 +53,18 @@ export default class ColumnChart {
     }).join('');
   }
 
-  update () {}
+  update (newData = []) {
+    this.data = newData;
+    const newBodyChart = this.element.getElementsByClassName('column-chart__chart')[0];
+    this.element.className = this.calcClass();
+    newBodyChart.innerHTML = this.getColumnChartBody();
+  }
 
-  destroy () {}
+  destroy () {
+    this.element.remove();
+  }
 
   remove () {
-    this.element.remove();
+    this.element.parentElement.remove();
   }
 }
