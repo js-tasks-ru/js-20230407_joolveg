@@ -43,6 +43,7 @@ export default class ColumnChart {
 
   getColumnChartBody () {
     const maxValue = Math.max(...this.data);
+
     const scale = this.chartHeight / maxValue;
 
     return this.data.map((item) => {
