@@ -1,5 +1,7 @@
 export default class NotificationMessage {
-  static timerId = null;
+  timerId = null;
+  static linkOnNotification = null;
+
   constructor(message = '', { duration = 0, type = ''} = {}) {
     this.type = type;
     this.duration = duration;
@@ -9,45 +11,46 @@ export default class NotificationMessage {
 
   getTemplate() {
     return `
-    <div class="timer"></div>
-    <div class="inner-wrapper">
-      <div class="notification-header">${this.type}</div>
-      <div class="notification-body">
-        ${this.message}
+      <div class="notification ${this.type}" style="--value: ${this.duration / 1000}s">
+        <div class="timer"></div>
+        <div class="inner-wrapper">
+          <div class="notification-header">${this.type}</div>
+          <div class="notification-body">
+            ${this.message}
+          </div>
+        </div>
       </div>
-    </div>`;
+    `;
   }
 
   render() {
     const wrapper = document.createElement('div');
-    wrapper.className = `notification ${this.type}`;
-    wrapper.style = `--value: ${this.duration / 1000 }s`;
     wrapper.innerHTML = this.getTemplate();
-    this.element = wrapper;
+    this.element = wrapper.firstElementChild;
   }
 
-  show(root) {
-    if (NotificationMessage.timerId) {
-      clearTimeout(NotificationMessage.timerId);
-      NotificationMessage.timerId = null;
-      this.destroy();
+  show(root = document.body) {
+    if (NotificationMessage.linkOnNotification) {
+      NotificationMessage.linkOnNotification.remove();
     }
 
-    if (root) {
-      root.innerHTML = this.element.outerHTML;
-    }
+    root.append(this.element);
 
-    document.body.append(root ? root : this.element);
-    NotificationMessage.timerId = setTimeout(() => this.remove(), this.duration);
-  }
-
-  destroy() {
-    const element = document.body.getElementsByClassName('notification')[0];
-    if (element) {element.remove();}
-    this.remove();
+    this.timerId = setTimeout(() => this.remove(), this.duration);
+    NotificationMessage.linkOnNotification = this;
   }
 
   remove() {
-    this.element.remove();
+    clearTimeout(this.timerId);
+
+    if (this.element) {
+      this.element.remove();
+    }
+  }
+
+  destroy() {
+    this.remove();
+    this.element = null;
+    NotificationMessage.linkOnNotification = null;
   }
 }
