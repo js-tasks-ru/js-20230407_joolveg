@@ -32,7 +32,6 @@ class Tooltip {
   destroy() {
     document.querySelector('.tooltip')?.remove();
     this.element = null;
-  }
 }
 
 export default Tooltip;
