@@ -76,7 +76,7 @@ export default class SortableTable {
       return `
         <a href="/products/${product.id}" class="sortable-table__row">
           ${this.headersConfig.map((column) => {
-            return column.template ? column.template(product.images) : (`<div class="sortable-table__cell">${product[column.id]}</div>`);
+            return column.template ? column.template(product[column.id]) : (`<div class="sortable-table__cell">${product[column.id]}</div>`);
           }).join('')}
         </a>
       `;
